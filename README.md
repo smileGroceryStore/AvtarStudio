@@ -14,7 +14,7 @@ npm.cmd run build
 
 模型与追踪权重不提交到 Git；`setup_assets.py` 从来源下载并准备所需目录，模型条款见 `frontend/public/assets/models/LICENSE-SOURCES.txt`。源码不包含个人导入的角色。
 
-挂件只有按住角色可见部分才能拖动，透明空白处不触发拖动。3D 按当前渲染像素透明度判断，2D 按实际 SVG 形状判断；选中角色后拖出轮廓仍会继续移动。
+挂件只有按住角色可见部分才能拖动，透明空白处不触发拖动，并将鼠标点击、滚轮和右键透传给后面的窗口；角色可见部分响应拖动和右键菜单。3D 按当前渲染像素透明度判断，2D 按实际 SVG 形状判断；选中角色后拖出轮廓仍会继续移动。
 
 ## Windows 桌面版
 
@@ -24,7 +24,7 @@ npm.cmd run build
 
 安装往返测试：`powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-installer.ps1`，在 test-results 下安装、检查文件、执行桌面烟雾测试再卸载，不改动个人模型和参数。
 
-双击 **启动桌面版.cmd**，或直接运行 **release-layout/AvatarStudio/AvatarStudio.exe**。
+双击 **启动桌面版.cmd**，或直接运行 **release-passthrough/AvatarStudio/AvatarStudio.exe**。
 
 - 独立 Windows 窗口，不需要手动启动终端或浏览器。
 - 绿色目录版：复制时请保留整个 `AvatarStudio` 文件夹及其中的 `_internal`，不能只复制 EXE。
@@ -77,7 +77,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File build-desktop.ps1
 桌面窗口/模型及原生推理测试（不访问摄像头）：
 
 ```powershell
-release-layout/AvatarStudio/AvatarStudio.exe --smoke-test --data-dir test-results/desktop-packaged --port 8095
+release-passthrough/AvatarStudio/AvatarStudio.exe --smoke-test --data-dir test-results/desktop-packaged --port 8095
 ```
 
 结果写入指定目录的 `desktop-smoke.json`，日志为 `desktop.log`。

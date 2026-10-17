@@ -14,7 +14,7 @@ $install = Start-Process -FilePath $setup -ArgumentList $installArgs -Wait -Pass
 if ($install.ExitCode -ne 0) { throw "Installation failed: $($install.ExitCode)" }
 $relativeFiles = @('AvatarStudio.exe','_internal\dist\index.html','_internal\desktop-assets\app.ico','THIRD-PARTY-NOTICES.txt')
 foreach ($relative in $relativeFiles) {
-    $original = Get-FileHash -LiteralPath (Join-Path "$projectRoot\release-layout\AvatarStudio" $relative)
+    $original = Get-FileHash -LiteralPath (Join-Path "$projectRoot\release-passthrough\AvatarStudio" $relative)
     $installed = Get-FileHash -LiteralPath (Join-Path $appDir $relative)
     if ($original.Hash -ne $installed.Hash) { throw "Installed file differs: $relative" }
 }

@@ -5,7 +5,7 @@ if ($RebuildDesktop) {
     & powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\build-desktop.ps1"
     if ($LASTEXITCODE -ne 0) { throw 'Desktop build failed.' }
 }
-if (-not (Test-Path -LiteralPath 'release-layout/AvatarStudio/AvatarStudio.exe')) {
+if (-not (Test-Path -LiteralPath 'release-passthrough/AvatarStudio/AvatarStudio.exe')) {
     throw 'Build desktop first: ./build-desktop.ps1'
 }
 if (-not $Compiler) {

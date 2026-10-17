@@ -1,5 +1,6 @@
 import {idleArmDirections} from './idle-poses.js';
 import { projectArm } from './arms2d.js';
+import {encodeAlphaMask} from './hit-mask.js';
 // Original layered SVG character. No external artwork or runtime required.
 export function initAvatar2D({viewport,output,widget}) {
  const host=document.createElement('div');host.className='avatar-2d';host.hidden=true;
@@ -101,5 +102,15 @@ export function initAvatar2D({viewport,output,widget}) {
   }
   return false;
  }
- return {hitTest,setState(next,visible){state=next;styleCharacter(next.settings?.petColor||'mint');active=visible;host.hidden=!visible;host.style.setProperty('--pet-accent',({mint:'#79d8c1',rose:'#efadca',blue:'#97c7f0'})[next.settings?.petColor]||'#79d8c1');if(output)viewport.classList.toggle('mirrored',!!next.settings?.mirror);}};
+ const maskCanvas=document.createElement('canvas'),maskContext=maskCanvas.getContext('2d',{willReadFrequently:true});
+ async function hitMask(){
+  if(!active||host.hidden)return null;
+  const box=viewport.getBoundingClientRect(),w=Math.max(1,Math.min(192,Math.ceil(box.width/3))),h=Math.max(1,Math.min(288,Math.ceil(box.height/3)));
+  const svg=host.querySelector('svg').cloneNode(true);svg.setAttribute('xmlns','http://www.w3.org/2000/svg');svg.setAttribute('width',w);svg.setAttribute('height',h);
+  const markup=new XMLSerializer().serializeToString(svg).replaceAll('var(--pet-accent)',host.style.getPropertyValue('--pet-accent'));
+  const url=URL.createObjectURL(new Blob([markup],{type:'image/svg+xml'}));
+  try{const image=new Image();image.src=url;await image.decode();maskCanvas.width=w;maskCanvas.height=h;maskContext.drawImage(image,0,0,w,h);return encodeAlphaMask(maskContext.getImageData(0,0,w,h).data,w,h,{mirror:viewport.classList.contains('mirrored')});}
+  finally{URL.revokeObjectURL(url);}
+ }
+ return {hitTest,hitMask,setState(next,visible){state=next;styleCharacter(next.settings?.petColor||'mint');active=visible;host.hidden=!visible;host.style.setProperty('--pet-accent',({mint:'#79d8c1',rose:'#efadca',blue:'#97c7f0'})[next.settings?.petColor]||'#79d8c1');if(output)viewport.classList.toggle('mirrored',!!next.settings?.mirror);}};
 }

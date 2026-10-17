@@ -8,6 +8,7 @@ import { dampFactor, scaleExpressions, rigQuaternionComponents, routeBlink, neut
 import { retargetDirection } from './retarget.js';
 import { relaxedArmDirections } from './rest-pose.js';
 import { clothingClearance } from './clothing-clearance.js';
+import {encodeAlphaMask} from './hit-mask.js';
 
 export function initAvatar({output, widget=false, onLoad, onError}) {
 let studioState = {settings:{},rig:{}};
@@ -360,6 +361,16 @@ function animate() {
 resize();
 animate();
 const hitPixel=new Uint8Array(4);
+let hitTarget=null,hitPixels=null;
+function hitMask(){
+ if(!vrm||canvas.hidden)return null;
+ const box=canvas.getBoundingClientRect(),w=Math.max(1,Math.min(192,Math.ceil(box.width/3))),h=Math.max(1,Math.min(288,Math.ceil(box.height/3)));
+ if(!hitTarget||hitTarget.width!==w||hitTarget.height!==h){hitTarget?.dispose();hitTarget=new THREE.WebGLRenderTarget(w,h);hitPixels=new Uint8Array(w*h*4);}
+ const previous=renderer.getRenderTarget();
+ try{renderer.setRenderTarget(hitTarget);renderer.render(scene,camera);renderer.readRenderTargetPixels(hitTarget,0,0,w,h,hitPixels);}
+ finally{renderer.setRenderTarget(previous);}
+ return encodeAlphaMask(hitPixels,w,h,{flipY:true,mirror:canvas.parentElement.classList.contains('mirrored')});
+}
 function hitTest(clientX,clientY){
   if(!vrm||canvas.hidden)return false;
   const box=canvas.getBoundingClientRect();
@@ -374,5 +385,5 @@ function hitTest(clientX,clientY){
   gl.readPixels(Math.min(canvas.width-1,Math.floor(x*canvas.width)),Math.min(canvas.height-1,Math.floor((1-y)*canvas.height)),1,1,gl.RGBA,gl.UNSIGNED_BYTE,hitPixel);
   return hitPixel[3]>=24;
 }
-return {load:loadVRM,hitTest, setState(next){studioState=next;}};
+return {load:loadVRM,hitTest,hitMask, setState(next){studioState=next;}};
 }

@@ -15,6 +15,7 @@ class DesktopControls:
         self._tray = None
         self._background = False
         self._quitting = False
+        self._pixel_input = None
         try:
             self._settings = json.loads((data / 'widget.json').read_text('utf-8'))
         except (OSError, ValueError):
@@ -43,6 +44,9 @@ class DesktopControls:
                 for control in native.Controls:
                     if hasattr(control, 'DefaultBackgroundColor'):
                         control.DefaultBackgroundColor = Color.Transparent
+                from desktop_hit_test import install_pixel_input
+                if self._pixel_input is None:
+                    self._pixel_input = install_pixel_input(native)
             native.Invoke(Action(configure))
         except Exception:
             logging.exception('Widget transparency configuration failed')
@@ -163,6 +167,16 @@ class DesktopControls:
 
     def widget_position(self):
         return {'x': self._widget.x, 'y': self._widget.y} if self._widget else {'x': 80, 'y': 140}
+
+    def set_widget_hit_mask(self, width, height, pixels):
+        if (type(width) is not int or type(height) is not int or not 1 <= width <= 256
+                or not 1 <= height <= 384 or not isinstance(pixels, str)
+                or len(pixels) != width * height or set(pixels) - {'0', '1'}):
+            raise ValueError('Invalid widget hit mask')
+        if self._pixel_input is not None:
+            self._on_ui(lambda: self._pixel_input.SetMask(width, height, pixels))
+            return True
+        return False
 
     def save_widget_position(self):
         self._save()

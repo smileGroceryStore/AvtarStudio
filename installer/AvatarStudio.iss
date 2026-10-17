@@ -1,5 +1,5 @@
 ﻿#ifndef ReleaseDir
-  #define ReleaseDir "..\release-layout\AvatarStudio"
+  #define ReleaseDir "..\release-passthrough\AvatarStudio"
 #endif
 #define AppVersion "0.8.0"
 

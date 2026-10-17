@@ -53,3 +53,5 @@ vendor/
 !.env.example
 
 assets/avatars/*.png
+
+release-passthrough/

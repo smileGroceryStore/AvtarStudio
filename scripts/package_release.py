@@ -4,7 +4,7 @@ from importlib.metadata import distributions
 import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
-DEST = ROOT / 'release-layout/AvatarStudio'
+DEST = ROOT / 'release-passthrough/AvatarStudio'
 
 def main():
     shutil.copy2(ROOT / 'DESKTOP-README.txt', DEST / '使用说明.txt')

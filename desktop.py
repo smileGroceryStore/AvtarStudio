@@ -217,6 +217,8 @@ def main():
                     form.BackColor = Color.FromArgb(255, 37, 75, 91)
                     form.TopMost = True
                     form.Show()
+                    native.TopMost = False
+                    native.TopMost = True
                     native.BringToFront()
                     backdrop.append(form)
                 controls._on_ui(create_backdrop)
@@ -234,12 +236,41 @@ def main():
                     result['widget']['nativeTransparent'] = pixel == 0x5b4b25
                 finally:
                     user32.ReleaseDC(None, dc)
-                    controls._on_ui(lambda: backdrop[0].Close())
                 if not result['widget']['nativeTransparent']:
                     raise RuntimeError('Native compositor transparency failed')
-                root = user32.GetAncestor(user32.WindowFromPoint(wintypes.POINT(
-                    (rect.left + rect.right)//2, rect.top + 25)), 2)
-                result['widget']['nativeMouseHit'] = root == hwnd
+                if controls._pixel_input is None:
+                    raise RuntimeError('Pixel input controller not initialized')
+                mask_deadline = time.monotonic() + 10
+                while controls._pixel_input.MaskInfo.startswith('0x0') and time.monotonic() < mask_deadline:
+                    time.sleep(.1)
+                result['widget']['maskBridge'] = controls._widget.evaluate_js("typeof window.pywebview?.api?.set_widget_hit_mask")
+                def verify_pixel_input():
+                    from System.Drawing import Point
+                    corner = native.PointToScreen(Point(2,2))
+                    center = native.PointToScreen(Point(native.ClientSize.Width//2,native.ClientSize.Height//2))
+                    controls._pixel_input.Probe(corner.X,corner.Y)
+                    blank_root = user32.GetAncestor(user32.WindowFromPoint(wintypes.POINT(corner.X,corner.Y)),2)
+                    result['widget']['blankMousePassThrough'] = blank_root == backdrop[0].Handle.ToInt64()
+                    display_dc = user32.GetDC(None)
+                    try:
+                        result['widget']['characterVisibleWhilePassing'] = gdi32.GetPixel(display_dc,center.X,center.Y) != 0x5b4b25
+                    finally:
+                        user32.ReleaseDC(None,display_dc)
+                    controls._pixel_input.Probe(center.X,center.Y)
+                    result['widget']['hitMask'] = controls._pixel_input.MaskInfo
+                    result['widget']['centerPassThrough'] = controls._pixel_input.Transparent
+                    result['widget']['inputStyles'] = controls._pixel_input.StyleInfo
+                    backdrop[0].Close()
+                    native.BringToFront()
+                    root = user32.GetAncestor(user32.WindowFromPoint(wintypes.POINT(center.X,center.Y)),2)
+                    result['widget']['nativeMouseHit'] = root == hwnd
+                    result['widget']['hitDiagnostic'] = dict(root=int(root or 0), expected=int(hwnd),current=int(native.Handle.ToInt64()),bounds=str(native.Bounds),windowState=str(native.WindowState),visible=bool(native.Visible),point=[center.X,center.Y])
+                    controls._pixel_input.ClearProbe()
+                controls._on_ui(verify_pixel_input)
+                if not result['widget']['blankMousePassThrough']:
+                    raise RuntimeError('Transparent blank area did not pass mouse input to underlying window')
+                if not result['widget']['characterVisibleWhilePassing']:
+                    raise RuntimeError('Character disappeared while blank area was mouse-transparent')
                 if not result['widget']['nativeMouseHit']:
                     raise RuntimeError('Widget native mouse hit test failed')
                 logging.info("Widget smoke: controls.resize_widget(-1)")

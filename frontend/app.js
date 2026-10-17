@@ -6,6 +6,7 @@ import {installLayout,labelButton} from './ui-layout.js';
 import { initAvatar } from './avatar.js';
 import { initAvatar2D } from './avatar2d.js';
 import { attachWidgetDrag } from './widget-drag.js';
+import {installHitMask} from './hit-mask.js';
 
 const widget = location.pathname === '/widget';
 const output = location.pathname === '/output' || widget;
@@ -33,6 +34,7 @@ const avatar3d = initAvatar({output, widget, onLoad:(name)=> {ready=true;documen
 
 const avatar2d=initAvatar2D({viewport:$('viewport'),output,widget});
 let activeMode='3d';
+if(widget)installHitMask(()=>activeMode==='2d'?avatar2d.hitMask():avatar3d.hitMask(),()=>window.pywebview?.api);
 const avatar={load:url=>avatar3d.load(url),setState(next){
   if(next.testBlink)next={...next,rig:{...next.rig,expressions:{...next.rig?.expressions,blink:1,blinkLeft:1,blinkRight:1}}};
   activeMode=next.settings?.avatarMode || '3d';
