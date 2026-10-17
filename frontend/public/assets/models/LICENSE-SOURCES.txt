@@ -1,0 +1,12 @@
+AvatarSample_A/B/C: pixiv / VRoid sample models. NOT CC0.
+Terms: https://vroid.pixiv.help/hc/en-us/articles/4402394424089-VRoidPreset-A-Z
+Mirror: https://github.com/madjin/vrm-samples/tree/master/vroid/stable
+Free use including commercial avatar activity; no paid redistribution of model files; no character creation service using model data. See full terms.
+sample.vrm: see assets/avatars/SAMPLE-README.md in project.
+
+Darkness_Shibu / Sakurada_Fumiriya: VRoid beta samples, embedded metadata: CC0. Mirror https://github.com/madjin/vrm-samples/tree/master/vroid/beta . Official sample terms https://vroid.pixiv.help/hc/en-us/articles/4402614652569 .
+UnityChan.vrm: ntny (UTJ/UCL), converted by esperecyan; (c) Unity Technologies Japan/UCL.
+Source: https://github.com/xelloss120/CharWebCam/tree/master/DefaultModel
+Model license: Unity-Chan License (UCL), NOT the repository's MIT license.
+https://unity-chan.com/contents/license_jp/ ; current official site https://unity3d.jp/unity-chan/
+Game character links in the UI are SOURCE LINKS ONLY. No Genshin/HSR files included in this package.

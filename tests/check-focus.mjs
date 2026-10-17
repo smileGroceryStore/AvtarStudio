@@ -1,0 +1,10 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const page=await browser.newPage();
+await page.goto('http://127.0.0.1:8097/?desktop=1');
+await page.locator('#sensitivity').focus();
+const focus=await page.locator('#sensitivity').evaluate(el=>({outline:getComputedStyle(el).outlineStyle,width:getComputedStyle(el).outlineWidth}));
+assert.equal(focus.outline,'solid');assert.equal(focus.width,'2px');
+console.log('Range keyboard focus: PASS');
+await browser.close();

@@ -1,0 +1,16 @@
+[project]
+name = "avatar-studio"
+version = "0.1.0"
+description = "Local webcam-driven VRM studio"
+requires-python = ">=3.11,<3.13"
+dependencies = ["aiohttp>=3.11,<4", "opencv-contrib-python>=4.10,<6", "mediapipe>=0.10.20,<0.11", "numpy>=1.26,<3", "scipy>=1.11,<2", "pygltflib>=1.16,<2", "pyyaml>=6,<7"]
+
+[project.optional-dependencies]
+desktop = [
+    "pywebview>=6,<7",
+]
+
+[dependency-groups]
+build = [
+    "pyinstaller>=6.16,<7",
+]

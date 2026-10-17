@@ -1,0 +1,14 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+const base='http://127.0.0.1:8098';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const page=await browser.newPage({viewport:{width:400,height:560}}),errors=[];
+page.on('pageerror',e=>errors.push(e.message));
+await page.request.post(base+'/api/control',{data:{action:'settings',settings:{avatarMode:'2d'}}});
+await page.goto(base+'/widget');await page.waitForSelector('.avatar-2d:not([hidden])');
+await page.request.post(base+'/api/control',{data:{action:'test-blink'}});
+await page.waitForFunction(()=>document.querySelector('#pet-lid-left').getAttribute('opacity')==='1'&&document.querySelector('#pet-lid-right').getAttribute('opacity')==='1');
+assert.equal(await page.locator('body').innerText(),'');
+await page.waitForFunction(()=>document.querySelector('#pet-lid-left').getAttribute('opacity')==='0');
+const state=await(await page.request.get(base+'/api/state')).json();assert.equal(state.running,false);
+assert.deepEqual(errors,[]);await browser.close();console.log('Shared blink test closes/reopens both 2D eyes without camera or widget text: PASS');

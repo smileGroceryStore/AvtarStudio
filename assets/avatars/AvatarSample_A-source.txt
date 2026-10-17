@@ -1,0 +1,5 @@
+AvatarSample_A by VRoid Project
+Official: https://hub.vroid.com/en/characters/2843975675147313744/models/5644550979324015604
+Terms: https://vroid.pixiv.help/hc/en-us/articles/4402394424089
+VRM copy: https://raw.githubusercontent.com/creativeIKEP/HolisticMotionCapture/main/Assets/StreamingAssets/DefaultSampleAvatar.vrm
+Not CC0. Follow official sample model terms.

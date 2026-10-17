@@ -1,0 +1,17 @@
+import { chromium } from '@playwright/test';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1050}});
+page.on('console',m=>console.log(m.type(),m.text()));
+page.on('pageerror',e=>console.log('PAGEERROR',e.message));
+await page.goto('http://127.0.0.1:8080');
+await page.waitForTimeout(2500);
+console.log('ZOOM INITIAL',await page.locator('#zoom').inputValue());
+await page.locator('#zoom').fill('1.2');
+await page.waitForTimeout(1000);
+console.log('STATE',await (await page.request.get('http://127.0.0.1:8080/api/state')).json());
+console.log('TOAST',await page.locator('#toast').textContent());
+await page.reload();
+await page.waitForTimeout(1000);
+console.log('ZOOM AFTER RELOAD',await page.locator('#zoom').inputValue(),await page.locator('#zoom').getAttribute('value'));
+await page.screenshot({path:'test-results/debug.png'});
+await browser.close();
